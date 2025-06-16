@@ -1,0 +1,12 @@
+[package]
+name = "failure-probability"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bincode = { version = "2.0.1", features = ["serde"] }
+clap = { version = "4.5.40", features = ["derive"] }
+once_cell = "1.21.3"
+rug = "1.27.0"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_with = "3.13.0"

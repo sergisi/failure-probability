@@ -50,7 +50,7 @@ class Distribution:
         s = 0
         ma = max(self.input_law.keys())
         if t >= ma:
-            return 0
+            return s
         for i in reversed(range(int(ceil(t)), ma)):
             s += self.input_law.get(i, 0) + self.input_law.get(-i, 0)
         return s
@@ -65,7 +65,7 @@ def _binomial(x: int, y: int) -> int:
 
 
 def _centered_binomial_pdf(k: int, x: int) -> float:
-    return _binomial(2 * k, x + k) / 2.0 ** (2 * k)
+    return _binomial(2 * k, x + k)/ 2.00 ** (2 * k)
 
 
 def build_centered_binomial_law(k: int) -> Distribution:
@@ -87,7 +87,8 @@ def compute_distribution(degree: int = 1024, size: int = 2) -> Distribution:
 
 
 def _tail(degree: int = 1024, size: int = 2, target: int = 300) -> Fraction:
-    res = compute_distribution(degree, size).tail_probability(target)
+    tmp = compute_distribution(degree, size)
+    res = tmp.tail_probability(target)
     return Fraction(res)
 
 
@@ -117,7 +118,7 @@ def _prob(degree: int = 1024, size: int = 2, target: int = 300) -> Fraction:
 
 @app.command()
 def probability(degree: int = 1024, size: int = 2, target: int = 300):
-    print(_prob(degree, size, target))
+    print(float(_prob(degree, size, target)))
 
 
 @app.command()
@@ -130,6 +131,20 @@ def search_coefficient(prob_target: float = 2 ** (-128)) -> None:
     )
     print(f"Coeff := {coef}, actual error := {float(err)}")
 
+
+@app.command()
+def check():
+    """
+    Check that the distribution is symmetric up to some tolerance due 
+    to errors.
+    """
+    dist = compute_distribution()
+    s = 0
+    ma = max(dist.input_law.keys())
+    for i in reversed(range(0, ma)):
+        if not math.isclose(dist.input_law.get(i, 0), dist.input_law.get(-i, 0)):
+            raise Exception(f'{dist.input_law.get(i, 0)} != {dist.input_law.get(-i, 0)}')
+    return s
 
 if __name__ == "__main__":
     app()
